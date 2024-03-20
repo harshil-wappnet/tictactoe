@@ -14,6 +14,7 @@ const Board = () => {
     const [Xtotalwin, setXtotalwin] = useState(0);
     const [Ototalwin, setOtotalwin] = useState(0);
     const [previousState, setPreviousState] = useState([]);
+    const [nextState, setNextState] = useState([]);
     const WIN_CONDITION = [
         [0, 1, 2],
         [3, 4, 5],
@@ -33,8 +34,8 @@ const Board = () => {
     }, [gameOver]);
 
     const handleClick = (index) => {
-        // setPreviousState([...buttonStates]);
         const newButtonStates = [...buttonStates];
+        setNextState([...newButtonStates]);
         if (newButtonStates[index] === null && !gameOver) {
             newButtonStates[index] = turnofX ? 'X' : 'O';
             setButtonStates(newButtonStates);
@@ -108,47 +109,54 @@ const Board = () => {
     }
 
     const undomove = () => {
-        // setTurnofX(!turnofX);
-        // setButtonStates([...previousState]);
         if (previousState.length > 0) {
             const prevState = previousState.pop();
             setButtonStates(prevState);
             setTurnofX(prevState => !prevState);
+            setNextState([...nextState, [...buttonStates]]);
+        }
+    }
+
+    const redomove = () => {
+        if (nextState.length > 0) {
+            const nextStateToRedo = nextState.pop();
+            if (Array.isArray(nextStateToRedo) && nextStateToRedo.length === buttonStates.length) {
+                setButtonStates(nextStateToRedo);
+                setPreviousState(prevState => [...prevState, [...buttonStates]]);
+                setTurnofX(prevState => !prevState);
+            }
         }
     }
 
     return (
-        <div className='d-flex align-items-center justify-content-center flex-row-reverse gap-5'>
-            <div className='row'>
-                <div className='col mt-5'>
-                    <TotalCounts Xtotalwin={Xtotalwin} Ototalwin={Ototalwin} />
-                </div>
-                <div className='col'>
-                    <ScoreCard XScore={Xscore} OScore={Oscore} TieScore={Tiescore} />
-                    <div className="board">
-                        <div className="row row-cols-3 gap-4">
-                            {buttonStates.map((state, index) => (
-                                <button
-                                    key={index}
-                                    className={`col-3 board-cell`}
-                                    onClick={() => handleClick(index)}
-                                    disabled={gameOver || state !== null}
-                                >
-                                    {state}
-                                </button>
-                            ))}
-                        </div>
+        <div className='row'>
+            <div className='col-lg-4 col mt-5'>
+                <TotalCounts Xtotalwin={Xtotalwin} Ototalwin={Ototalwin} />
+                <PreviousWinner previousWinner={previousWinner} />
+            </div>
+            <div className='col'>
+                <ScoreCard XScore={Xscore} OScore={Oscore} TieScore={Tiescore} />
+                <div className="board">
+                    <div className="row row-cols-3 gap-2" style={{ marginLeft: "10px" }}>
+                        {buttonStates.map((state, index) => (
+                            <button
+                                key={index}
+                                className={`col-3 board-cell`}
+                                onClick={() => handleClick(index)}
+                                disabled={gameOver || state !== null}
+                            >
+                                {state}
+                            </button>
+                        ))}
                     </div>
+                </div>
+                <div className='mt-3'>
                     <button className='btn rounded bg-dark text-white' onClick={startnewgame}>Start New Game</button>
                     <button className='btn rounded bg-dark text-white mx-1' onClick={restart}>Restart Game</button>
                     <button className='btn rounded bg-dark text-white mx-1' onClick={undomove}>Undo Move</button>
-                </div>
-
-                <div className='col mt-5'>
-                    <PreviousWinner previousWinner={previousWinner} />
+                    <button className='btn rounded bg-dark text-white mx-1' onClick={redomove}>Redo Move</button>
                 </div>
             </div>
-            {/* <h3>Now, turn of {turnofX ? "X" : "O"}</h3> */}
         </div>
     );
 };

@@ -4,7 +4,7 @@ const TotalCounts = ({ Xtotalwin, Ototalwin }) => {
     return (
         <div>
             <h4>Total Wins</h4>
-            <table className='justify-content-center w-100 align-items-center winner-card'>
+            <table className='w-100 winner-card'>
                 <thead>
                     <tr>
                         <td>X</td>

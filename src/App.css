@@ -4,6 +4,7 @@
 
 body {
   height: 100vh !important;
+  background-color: rgb(84, 221, 214) !important;
 }
 
 .board {
@@ -11,8 +12,16 @@ body {
   /* margin: 10px 570px; */
   margin-left: auto;
   margin-right: auto;
+  background-color: bisque;
+  padding: 10px;
 }
 
+.board button:hover {
+  transition: transform 0.2s, border-color 0.2s;
+  transform: scale(1.2);
+  cursor: pointer;
+  border: 2px solid transparent;
+}
 .board-cell {
   width: 100px !important;
   border: none;
@@ -42,7 +51,7 @@ body {
   margin: 3rem auto;
   font-weight: bold;
   font-size: 22px;
-  border-radius: 10%;
+  background-color: bisque;
 }
 
 .x-score {
@@ -58,7 +67,7 @@ body {
 }
 
 .tie-score {
-  color: rgb(82, 220, 28);
+  color: rgb(18, 34, 212);
   width: 33%;
   padding: 15px;
 }
@@ -66,9 +75,12 @@ body {
 .winner-card {
   text-align: center;
   height: 7rem;
-  background-color: rgb(27, 152, 205);
+  background-color: rgb(30, 12, 162);
   color: white;
   width: 50px;
   height: 40px;
-  border-radius: 10%;
+}
+
+thead {
+  background-color: #888;
 }
