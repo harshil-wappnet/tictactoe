@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ScoreCard from './ScoreCard';
+import PreviousWinner from './PreviousWinner';
+import TotalCounts from './TotalCounts';
 
 const Board = () => {
     const [buttonStates, setButtonStates] = useState(Array(9).fill(null));
@@ -7,7 +9,11 @@ const Board = () => {
     const [Xscore, setXScore] = useState(0);
     const [Oscore, setOScore] = useState(0);
     const [Tiescore, setTieScore] = useState(0);
-    const [gameOver, setgameOver] = useState(false);
+    const [gameOver, setGameOver] = useState(false);
+    const [previousWinner, setPreviousWinner] = useState([]);
+    const [Xtotalwin, setXtotalwin] = useState(0);
+    const [Ototalwin, setOtotalwin] = useState(0);
+    const [previousState, setPreviousState] = useState([]);
     const WIN_CONDITION = [
         [0, 1, 2],
         [3, 4, 5],
@@ -19,32 +25,57 @@ const Board = () => {
         [2, 4, 6],
     ];
 
+
+    useEffect(() => {
+        if (gameOver) {
+            reset();
+        }
+    }, [gameOver]);
+
     const handleClick = (index) => {
+        // setPreviousState([...buttonStates]);
         const newButtonStates = [...buttonStates];
-        if (newButtonStates[index] === null) {
+        if (newButtonStates[index] === null && !gameOver) {
             newButtonStates[index] = turnofX ? 'X' : 'O';
             setButtonStates(newButtonStates);
             setTurnofX(!turnofX);
-            const winner = checkWinner(newButtonStates);
-            if (winner === 'X') {
-                setXScore((prevScore) => prevScore + 1);
-                setgameOver(true);
-            } else if (winner === 'O') {
-                setOScore((prevScore) => prevScore + 1);
-                setgameOver(true);
-            }
+            setPreviousState([...previousState, [...buttonStates]]);
+        }
+        const winner = checkWinner(newButtonStates);
+        if (winner === 'X') {
+            setXScore((prevScore) => prevScore + 1);
+            setXtotalwin((prevTotal) => prevTotal + 1);
+            setGameOver(true);
+            setPreviousWinner((prevWinners) => [...prevWinners, winner]);
+        } else if (winner === 'O') {
+            setOScore((prevScore) => prevScore + 1);
+            setOtotalwin((prevTotal) => prevTotal + 1);
+            setGameOver(true);
+            setPreviousWinner((prevWinners) => [...prevWinners, winner]);
         }
 
+        let filled = true;
+        newButtonStates.forEach((item) => {
+            if (item === null) {
+                filled = false;
+            }
+        });
+        if (filled && winner === null) {
+            setTieScore((prevScore) => prevScore + 1);
+            setGameOver(true);
+            setPreviousWinner((prevWinners) => [...prevWinners, "Tie"]);
+        }
     };
 
     const checkWinner = (newButtonStates) => {
         for (let i = 0; i < WIN_CONDITION.length; i++) {
             const [x, y, z] = WIN_CONDITION[i];
             if (
-                newButtonStates[x] &&
+                newButtonStates[x] !== null &&
                 newButtonStates[x] === newButtonStates[y] &&
                 newButtonStates[x] === newButtonStates[z]
             ) {
+                setButtonStates(Array(9).fill(null));
                 return newButtonStates[x];
             }
         }
@@ -52,33 +83,72 @@ const Board = () => {
     };
 
     const reset = () => {
-        setgameOver(false);
         setButtonStates(Array(9).fill(null));
+        setGameOver(false);
     };
 
-    const restart = () => {
-        setgameOver(false);
+    const startnewgame = () => {
         setButtonStates(Array(9).fill(null));
         setOScore(0);
         setXScore(0);
+        setTieScore(0);
+        setGameOver(false);
+        setPreviousWinner([]);
+        setOtotalwin(0);
+        setXtotalwin(0);
+        setPreviousState([]);
+    };
+
+    const restart = () => {
+        setButtonStates(Array(9).fill(null));
+        setOScore(0);
+        setXScore(0);
+        setTieScore(0);
+        setGameOver(false);
     }
+
+    const undomove = () => {
+        // setTurnofX(!turnofX);
+        // setButtonStates([...previousState]);
+        if (previousState.length > 0) {
+            const prevState = previousState.pop();
+            setButtonStates(prevState);
+            setTurnofX(prevState => !prevState);
+        }
+    }
+
     return (
-        <div>
-            <ScoreCard XScore={Xscore} OScore={Oscore} />
-            <div className="board">
-                <div className="row row-cols-3 gap-4">
-                    {buttonStates.map((state, index) => (
-                        <button
-                            key={index}
-                            className={`col-3 board-cell`}
-                            onClick={gameOver === true ? reset : () => handleClick(index)}
-                        >
-                            {state}
-                        </button>
-                    ))}
+        <div className='d-flex align-items-center justify-content-center flex-row-reverse gap-5'>
+            <div className='row'>
+                <div className='col mt-5'>
+                    <TotalCounts Xtotalwin={Xtotalwin} Ototalwin={Ototalwin} />
+                </div>
+                <div className='col'>
+                    <ScoreCard XScore={Xscore} OScore={Oscore} TieScore={Tiescore} />
+                    <div className="board">
+                        <div className="row row-cols-3 gap-4">
+                            {buttonStates.map((state, index) => (
+                                <button
+                                    key={index}
+                                    className={`col-3 board-cell`}
+                                    onClick={() => handleClick(index)}
+                                    disabled={gameOver || state !== null}
+                                >
+                                    {state}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <button className='btn rounded bg-dark text-white' onClick={startnewgame}>Start New Game</button>
+                    <button className='btn rounded bg-dark text-white mx-1' onClick={restart}>Restart Game</button>
+                    <button className='btn rounded bg-dark text-white mx-1' onClick={undomove}>Undo Move</button>
+                </div>
+
+                <div className='col mt-5'>
+                    <PreviousWinner previousWinner={previousWinner} />
                 </div>
             </div>
-            <button className='btn rounded bg-dark text-white' onClick={restart}>Restart Game</button>
+            {/* <h3>Now, turn of {turnofX ? "X" : "O"}</h3> */}
         </div>
     );
 };

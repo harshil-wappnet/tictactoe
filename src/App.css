@@ -6,13 +6,11 @@ body {
   height: 100vh !important;
 }
 
-.container {
-  height: 100vh !important;
-}
-
 .board {
   width: 400px;
-  margin: 10px 570px;
+  /* margin: 10px 570px; */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .board-cell {
@@ -25,9 +23,10 @@ body {
   width: 5rem;
   height: 5rem;
   text-align: center;
-  font-weight: bold;
+  font-weight: bolder;
   list-style: 5rem;
   margin: 0.5rem;
+  color: black;
 }
 
 .board-cell:hover {
@@ -62,4 +61,14 @@ body {
   color: rgb(82, 220, 28);
   width: 33%;
   padding: 15px;
+}
+
+.winner-card {
+  text-align: center;
+  height: 7rem;
+  background-color: rgb(27, 152, 205);
+  color: white;
+  width: 50px;
+  height: 40px;
+  border-radius: 10%;
 }
