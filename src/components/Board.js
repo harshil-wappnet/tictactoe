@@ -15,6 +15,8 @@ const Board = () => {
     const [Ototalwin, setOtotalwin] = useState(0);
     const [previousState, setPreviousState] = useState([]);
     const [nextState, setNextState] = useState([]);
+    const [totalMatch, setTotalMatch] = useState(0);
+    const [tieCount, setTieCount] = useState(0);
     const WIN_CONDITION = [
         [0, 1, 2],
         [3, 4, 5],
@@ -65,6 +67,8 @@ const Board = () => {
             setTieScore((prevScore) => prevScore + 1);
             setGameOver(true);
             setPreviousWinner((prevWinners) => [...prevWinners, "Tie"]);
+            setTieCount(tieCount + 1);
+            setTotalMatch(totalMatch + 1);
         }
     };
 
@@ -77,6 +81,7 @@ const Board = () => {
                 newButtonStates[x] === newButtonStates[z]
             ) {
                 setButtonStates(Array(9).fill(null));
+                setTotalMatch(totalMatch + 1);
                 return newButtonStates[x];
             }
         }
@@ -131,7 +136,7 @@ const Board = () => {
     return (
         <div className='row'>
             <div className='col-lg-4 col mt-5'>
-                <TotalCounts Xtotalwin={Xtotalwin} Ototalwin={Ototalwin} />
+                <TotalCounts Xtotalwin={Xtotalwin} Ototalwin={Ototalwin} totalMatch={totalMatch} tieCount={tieCount} />
                 <PreviousWinner previousWinner={previousWinner} />
             </div>
             <div className='col'>
